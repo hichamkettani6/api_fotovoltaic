@@ -1,0 +1,54 @@
+services:
+
+  api_grafici_fotovoltaico:
+    stdin_open: true
+    tty: true
+    image: api_grafici_fotovoltaico:latest
+    volumes:
+      - ./api:/app
+      - ./templates:/templates
+      - ./static:/static
+    env_file:
+      - ./.env
+    ports:
+      - "8082:80"
+    restart: always
+
+  #mongodb:
+  #  image: mongo:latest
+  #  ports:
+  #    - "27018:27017"
+  #  volumes:
+  #    - ./mongo-data:/data/db
+  #  environment:
+  #    MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
+  #    MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+  #    TZ: $TZ
+  #  restart: always
+
+  redis:
+    image: "redis:alpine"
+
+  worker:
+    image: celery:latest
+    command: celery -A celery_app worker --loglevel=info
+    volumes:
+      - ./api/celery_app.py:/celery_app.py
+    environment:
+      CELERY_BROKER_URL: $CELERY_BROKER_URL
+      CELERY_RESULT_BACKEND: $CELERY_RESULT_BACKEND
+      REDIS_URL: $REDIS_URL
+    depends_on:
+      - redis
+
+  beat:
+    image: celery:latest
+    command: celery -A celery_app beat --loglevel=info
+    volumes:
+      - ./api/celery_app.py:/celery_app.py
+    environment:
+      CELERY_BROKER_URL: $CELERY_BROKER_URL
+      CELERY_RESULT_BACKEND: $CELERY_RESULT_BACKEND
+      REDIS_URL: $REDIS_URL
+    depends_on:
+      - redis
