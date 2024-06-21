@@ -1,3 +1,0 @@
-fastapi
-celery[redis]
-uvicorn
