@@ -137,7 +137,7 @@
         document.getElementById('current-datetime').innerText = formattedDateTime;
     }
 
-    var ws = new WebSocket("ws://localhost:8082/ws");
+    var ws = new WebSocket("{{ ws_url }}");
     ws.onmessage = function(event) {
                     var weatherDiv = document.getElementById('current-weather');
                     weatherDiv.innerHTML = `<i class="fas fa-cloud"></i> ${event.data}`;

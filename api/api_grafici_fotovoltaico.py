@@ -67,7 +67,8 @@ async def dataToDB_handler(request: Request, call_next):
 @app.get("/", response_class=HTMLResponse)
 async def get_layout(request: Request):
     templates = request.scope.get("templates")
-    return templates.TemplateResponse(request=request, name="layout.html")
+    context = {"ws_url": os.getenv("WS_URL")}
+    return templates.TemplateResponse(request=request, name="layout.html", context=context)
 
 
 @app.get("/update")
